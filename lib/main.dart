@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     'Canada',
   ];
   Fruit? _fruit = Fruit.apple;
+  List<Item> _items = generateItems(5);
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -157,25 +158,51 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          DataTable(columns: const [
-            DataColumn(label: Text('ID')),
-            DataColumn(label: Text('First Name')),
-            DataColumn(label: Text('Last Name')),
-            DataColumn(label: Text('Age'))
-          ], rows: const [
-            DataRow(cells: [
-              DataCell(Text('1')),
-              DataCell(Text('Prajwol')),
-              DataCell(Text('Pradhan')),
-              DataCell(Text('23'))
-            ]),
-            DataRow(cells: [
-              DataCell(Text('2')),
-              DataCell(Text('Babin')),
-              DataCell(Text('Dangol')),
-              DataCell(Text('20'))
-            ])
-          ])
+          Column(
+            children: [
+              DataTable(columns: const [
+                DataColumn(label: Text('ID')),
+                DataColumn(label: Text('First Name')),
+                DataColumn(label: Text('Last Name')),
+                DataColumn(label: Text('Age'))
+              ], rows: const [
+                DataRow(cells: [
+                  DataCell(Text('1')),
+                  DataCell(Text('Prajwol')),
+                  DataCell(Text('Pradhan')),
+                  DataCell(Text('23'))
+                ]),
+                DataRow(cells: [
+                  DataCell(Text('2')),
+                  DataCell(Text('Babin')),
+                  DataCell(Text('Dangol')),
+                  DataCell(Text('20'))
+                ])
+              ]),
+              ExpansionPanelList(
+                elevation: 2,
+                expandedHeaderPadding: EdgeInsets.all(0),
+                expansionCallback: (int index, bool isExpanded) {
+                  setState(() {
+                    _items[index].isExpanded = !isExpanded;
+                  });
+                },
+                children: _items.map<ExpansionPanel>((Item item) {
+                  return ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(item.headerValue),
+                      );
+                    },
+                    body: ListTile(
+                      title: Text(item.expandedValue),
+                    ),
+                    isExpanded: item.isExpanded,
+                  );
+                }).toList(),
+              ),
+            ],
+          )
         ]),
         drawer: Drawer(
             child: ListView(
@@ -270,4 +297,25 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+}
+
+class Item {
+  Item({
+    required this.expandedValue,
+    required this.headerValue,
+    this.isExpanded = false,
+  });
+
+  String expandedValue;
+  String headerValue;
+  bool isExpanded;
+}
+
+List<Item> generateItems(int numberOfItems) {
+  return List<Item>.generate(numberOfItems, (int index) {
+    return Item(
+      headerValue: 'Panel $index',
+      expandedValue: 'This is item number $index',
+    );
+  });
 }
